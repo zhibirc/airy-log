@@ -1,7 +1,11 @@
+'use strict';
+
 module.exports = function airyLog ( data, addTimestamp ) {
     var dataType, timeStamp, filePath, message;
 
-    if ( airyLog.silent ) return;
+    if ( airyLog.silent ) {
+        return;
+    }
 
     dataType  = Array.isArray(data) && 'array' || typeof data;
     timeStamp = addTimestamp && Date.now();
