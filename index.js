@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = function airyLog ( data, addTimestamp ) {
-    var dataType, timeStamp, filePath, message;
+    var dataType, timeStamp, filePath, message, replacer;
 
     if ( airyLog.silent ) {
         return;
@@ -37,12 +37,35 @@ module.exports = function airyLog ( data, addTimestamp ) {
 
             break;
         case 'object':
-            message = JSON.stringify(data);
+            if ( data === null ) {
+                message = data;
+
+                break;
+            }
+
+            replacer = function () {
+                var seen = [];
+
+                return function ( key, value ) {
+                    if ( typeof value === 'object' && value !== null ) {
+                        if ( seen.indexOf(value) !== -1 ) {
+                            return;
+                        }
+
+                        seen.push(value);
+                    }
+
+                    return value;
+                };
+            };
+
+            message = JSON.stringify(data, replacer());
 
             break;
         case 'number':
         case 'string':
         case 'boolean':
+        case 'undefined':
             message = data;
     }
 
