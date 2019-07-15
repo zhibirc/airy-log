@@ -1,0 +1,28 @@
+{
+    "name": "airy-log",
+    "version": "1.0.0",
+    "description": "Simple wrapped native logger.",
+    "author": "",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/zhibirc/airy-log.git"
+    },
+    "bugs": {
+        "url": "https://github.com/zhibirc/airy-log/issues"
+    },
+    "homepage": "https://github.com/zhibirc/airy-log#readme",
+    "scripts": {
+        "lint": "eslint .",
+        "lint:fix": "eslint --fix .",
+        "test": "npm run lint"
+    },
+    "dependencies": {
+        "mocha": "^5.2.0",
+        "should": "^13.2.3"
+    },
+    "devDependencies": {
+        "cjs-eslint": "^1.2.4"
+    },
+    "keywords": [],
+    "license": "MIT"
+}
