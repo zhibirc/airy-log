@@ -43,21 +43,33 @@ module.exports = function airyLog ( data, addTimestamp ) {
                 break;
             }
 
-            replacer = function () {
-                var seen = [];
+            if ( /^\[object [a-zA-Z]+Event\]$/.test(Object.prototype.toString.call(data)) ) {
+                replacer = function () {
+                    return function ( event ) {
+                        return Object.keys(event).reduce(function ( collector, key ) {
+                            collector[key] = typeof event[key] === 'object' ? '{ ... }' : event[key];
 
-                return function ( key, value ) {
-                    if ( typeof value === 'object' && value !== null ) {
-                        if ( seen.indexOf(value) !== -1 ) {
-                            return;
+                            return collector;
+                        }, {});
+                    };
+                };
+            } else {
+                replacer = function () {
+                    var seen = [];
+
+                    return function ( key, value ) {
+                        if ( typeof value === 'object' && value !== null ) {
+                            if ( seen.indexOf(value) !== -1 ) {
+                                return;
+                            }
+
+                            seen.push(value);
                         }
 
-                        seen.push(value);
-                    }
-
-                    return value;
+                        return value;
+                    };
                 };
-            };
+            }
 
             message = JSON.stringify(data, replacer());
 
