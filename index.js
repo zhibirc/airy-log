@@ -3,9 +3,13 @@
 module.exports = function airyLog ( data, addTimestamp ) {
     var dataType, timeStamp, filePath, message, replacer;
 
-    if ( airyLog.silent ) {
+    // suppress logging output or not
+    if ( log.silent ) {
         return;
     }
+
+    // maximum output length
+    log.limit = log.limit || 1000;
 
     dataType  = Array.isArray(data) && 'array' || typeof data;
     timeStamp = addTimestamp && Date.now();
@@ -44,15 +48,16 @@ module.exports = function airyLog ( data, addTimestamp ) {
             }
 
             if ( /^\[object [a-zA-Z]+Event\]$/.test(Object.prototype.toString.call(data)) ) {
-                replacer = function () {
-                    return function ( event ) {
-                        return Object.keys(event).reduce(function ( collector, key ) {
-                            collector[key] = typeof event[key] === 'object' ? '{ ... }' : event[key];
+                data = Object.keys(data).reduce(function ( collector, key ) {
+                    var value = data[key];
 
-                            return collector;
-                        }, {});
-                    };
-                };
+                    collector[key] = value === null ? null : typeof value === 'object' ? '{ ... }' : value;
+
+                    return collector;
+                }, {});
+
+                dataType = 'event';
+                message  = JSON.stringify(data);
             } else {
                 replacer = function () {
                     var seen = [];
@@ -69,9 +74,9 @@ module.exports = function airyLog ( data, addTimestamp ) {
                         return value;
                     };
                 };
-            }
 
-            message = JSON.stringify(data, replacer());
+                message = JSON.stringify(data, replacer());
+            }
 
             break;
         case 'number':
@@ -82,12 +87,14 @@ module.exports = function airyLog ( data, addTimestamp ) {
     }
 
     console.log(
-        timeStamp ? timeStamp + ' ' : '' +
+        '\n' +
 
-            '[' + filePath + '] ' +
+        (timeStamp ? timeStamp + ' ' : '') +
 
-            '<' + dataType[0] + '> ' +
+        '[' + filePath + '] ' +
 
-            message
+        '<' + dataType[0] + '> ' +
+
+        message.slice(0, log.limit)
     );
 };
