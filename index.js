@@ -4,12 +4,12 @@ module.exports = function airyLog ( data, addTimestamp ) {
     var dataType, timeStamp, filePath, message, replacer;
 
     // suppress logging output or not
-    if ( log.silent ) {
+    if ( airyLog.silent ) {
         return;
     }
 
     // maximum output length
-    log.limit = log.limit || 1000;
+    airyLog.limit = airyLog.limit || 1000;
 
     dataType  = Array.isArray(data) && 'array' || typeof data;
     timeStamp = addTimestamp && Date.now();
@@ -71,6 +71,7 @@ module.exports = function airyLog ( data, addTimestamp ) {
                             seen.push(value);
                         }
 
+                        // eslint-disable-next-line consistent-return
                         return value;
                     };
                 };
@@ -95,6 +96,6 @@ module.exports = function airyLog ( data, addTimestamp ) {
 
         '<' + dataType[0] + '> ' +
 
-        message.slice(0, log.limit)
+        String(message).slice(0, airyLog.limit)
     );
 };
